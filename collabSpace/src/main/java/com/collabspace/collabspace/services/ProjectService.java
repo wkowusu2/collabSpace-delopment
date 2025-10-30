@@ -6,18 +6,26 @@ import com.collabspace.collabspace.entity.Project;
 import com.collabspace.collabspace.entity.Team;
 import com.collabspace.collabspace.repository.ProjectRepository;
 import com.collabspace.collabspace.repository.TeamRepository;
+import com.collabspace.collabspace.utils.ProjectValidator;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+
+import static com.collabspace.collabspace.utils.ProjectMapper.getProjectResponseDto;
 
 @Service
 public class ProjectService {
     private final ProjectRepository projectRepository;
     private final TeamRepository teamRepository;
-    public ProjectService(ProjectRepository projectRepository, TeamRepository teamRepository) {
+    private final ProjectValidator projectValidator;
+
+    public ProjectService(ProjectRepository projectRepository, TeamRepository teamRepository, ProjectValidator projectValidator) {
         this.projectRepository = projectRepository;
         this.teamRepository = teamRepository;
+        this.projectValidator = projectValidator;
     }
 
     @Transactional
@@ -37,15 +45,32 @@ public class ProjectService {
         Team savedTeam = teamRepository.save(team);
         project.setTeam(savedTeam);
         Project savedProject = projectRepository.save(project);
-        ProjectResponseDto responseDto = new ProjectResponseDto();
-        responseDto.setId(savedProject.getId());
-        responseDto.setName(savedProject.getName());
-        responseDto.setDescription(savedProject.getDescription());
-        responseDto.setCreatedBy(savedProject.getCreatedBy());
-        responseDto.setStartDate(savedProject.getStartDate());
-        responseDto.setEndDate(savedProject.getEndDate());
-        responseDto.setTeamId(savedProject.getTeam().getId());
-        responseDto.setStatus(savedProject.getStatus());
+        return getProjectResponseDto(savedProject);
+    }
+
+    @Transactional
+    public ProjectResponseDto updateProject(UUID projectId,ProjectRequestDto projectRequestDto, UUID createdBy) {
+        Project project = projectValidator.ensureProjectExists(projectId);
+        project.setName(projectRequestDto.getName());
+        project.setDescription(projectRequestDto.getDescription());
+        project.setStartDate(projectRequestDto.getStart_date());
+        project.setEndDate(projectRequestDto.getEnd_date());
+        Project savedProject = projectRepository.save(project);
+        return getProjectResponseDto(savedProject);
+    }
+
+
+    public ProjectResponseDto getProjectById(UUID projectId) {
+        Project project = projectValidator.ensureProjectExists(projectId);
+        return getProjectResponseDto(project);
+    }
+
+    public Map<String, String> deleteProject(UUID projectId) {
+        Project project = projectValidator.ensureProjectExists(projectId);
+        projectRepository.deleteById(project.getId());
+        Map<String, String> responseDto = new HashMap<>();
+        responseDto.put("status", "success");
+        responseDto.put("message", project.getName() +" has been deleted");
         return responseDto;
     }
 }
