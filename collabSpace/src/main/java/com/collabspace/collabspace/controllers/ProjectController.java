@@ -27,13 +27,13 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
-    @GetMapping("{/projectId}")
+    @GetMapping("/{projectId}")
     public ResponseEntity<ProjectResponseDto> getProjectById(@PathVariable UUID projectId){
         ProjectResponseDto projectResponseDto = projectService.getProjectById(projectId);
         return ResponseEntity.ok(projectResponseDto);
     }
 
-    @PutMapping("{/projectId}")
+    @PutMapping("/{projectId}")
     public ResponseEntity<ProjectResponseDto>  updateProject(@Valid @PathVariable UUID projectId, @RequestBody ProjectRequestDto projectDto,
                                                              @RequestHeader("X-User-Id") UUID userId)
     {
@@ -41,7 +41,7 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
-    @DeleteMapping("{/projectId}")
+    @DeleteMapping("/{projectId}")
     public ResponseEntity<Map<String, String>> deleteProject(@PathVariable UUID projectId){
         Map<String, String> responseDto = projectService.deleteProject(projectId);
         return ResponseEntity.ok(responseDto);
