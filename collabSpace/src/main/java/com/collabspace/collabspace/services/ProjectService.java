@@ -8,6 +8,8 @@ import com.collabspace.collabspace.repository.ProjectRepository;
 import com.collabspace.collabspace.repository.TeamRepository;
 import com.collabspace.collabspace.utils.ProjectValidator;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -17,16 +19,12 @@ import java.util.UUID;
 import static com.collabspace.collabspace.utils.ProjectMapper.getProjectResponseDto;
 
 @Service
+@AllArgsConstructor
 public class ProjectService {
     private final ProjectRepository projectRepository;
     private final TeamRepository teamRepository;
     private final ProjectValidator projectValidator;
 
-    public ProjectService(ProjectRepository projectRepository, TeamRepository teamRepository, ProjectValidator projectValidator) {
-        this.projectRepository = projectRepository;
-        this.teamRepository = teamRepository;
-        this.projectValidator = projectValidator;
-    }
 
     @Transactional
     public ProjectResponseDto createProject(ProjectRequestDto projectRequestDto, UUID createdBy) {
