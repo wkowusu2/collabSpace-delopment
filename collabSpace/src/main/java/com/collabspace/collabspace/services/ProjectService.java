@@ -2,8 +2,12 @@ package com.collabspace.collabspace.services;
 
 import com.collabspace.collabspace.dto.ProjectRequestDto;
 import com.collabspace.collabspace.dto.ProjectResponseDto;
+import com.collabspace.collabspace.dto.UserDetailsDto;
 import com.collabspace.collabspace.entity.Project;
+import com.collabspace.collabspace.entity.ProjectMembers;
 import com.collabspace.collabspace.entity.Team;
+import com.collabspace.collabspace.enums.MemberRole;
+import com.collabspace.collabspace.repository.ProjectMembersRepository;
 import com.collabspace.collabspace.repository.ProjectRepository;
 import com.collabspace.collabspace.repository.TeamRepository;
 import com.collabspace.collabspace.utils.ProjectValidator;
@@ -22,27 +26,29 @@ import static com.collabspace.collabspace.utils.ProjectMapper.getProjectResponse
 @AllArgsConstructor
 public class ProjectService {
     private final ProjectRepository projectRepository;
-    private final TeamRepository teamRepository;
+    private final ProjectMembersRepository projectMembersRepository;
     private final ProjectValidator projectValidator;
 
 
     @Transactional
-    public ProjectResponseDto createProject(ProjectRequestDto projectRequestDto, UUID createdBy) {
+    public ProjectResponseDto createProject(ProjectRequestDto projectRequestDto, UserDetailsDto userDetails) {
         //create a project
         Project project = new Project();
         project.setName(projectRequestDto.getName());
         project.setDescription(projectRequestDto.getDescription());
-        project.setCreatedBy(createdBy);
+        project.setCreatedBy(userDetails.getId());
         project.setStartDate(projectRequestDto.getStart_date());
         project.setEndDate(projectRequestDto.getEnd_date());
-
-        //create the team
-        Team team = new Team();
-        team.setName(projectRequestDto.getName() + " Team");
-        team.setCreatedBy(createdBy);
-        Team savedTeam = teamRepository.save(team);
-        project.setTeam(savedTeam);
         Project savedProject = projectRepository.save(project);
+
+        //Add creator to the project as member with Admin role
+        ProjectMembers member = new ProjectMembers();
+        member.setMemberRole(MemberRole.PROJECT_ADMIN);
+        member.setProjectId(project.getId());
+        member.setMemberId(userDetails.getId());
+        member.setEmail(userDetails.getEmail());
+        member.setFullName(userDetails.getFullName());
+        projectMembersRepository.save(member);
         return getProjectResponseDto(savedProject);
     }
 

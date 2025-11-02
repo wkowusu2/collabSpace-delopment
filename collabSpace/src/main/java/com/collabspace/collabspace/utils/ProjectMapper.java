@@ -14,7 +14,6 @@ public class ProjectMapper {
         responseDto.setCreatedBy(savedProject.getCreatedBy());
         responseDto.setStartDate(savedProject.getStartDate());
         responseDto.setEndDate(savedProject.getEndDate());
-        responseDto.setTeamId(savedProject.getTeam().getId());
         responseDto.setStatus(savedProject.getStatus());
         return responseDto;
     }

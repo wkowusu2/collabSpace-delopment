@@ -16,6 +16,5 @@ public class ProjectResponseDto {
     public LocalDate startDate;
     public LocalDate endDate;
     private ProjectStatus status;
-    private UUID teamId;
     private UUID createdBy;
 }
