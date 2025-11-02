@@ -1,6 +1,7 @@
 package com.collabspace.collabspace.controllers;
 
 import com.collabspace.collabspace.dto.*;
+import com.collabspace.collabspace.entity.Task;
 import com.collabspace.collabspace.enums.TaskStatus;
 import com.collabspace.collabspace.services.TaskService;
 import jakarta.validation.Valid;

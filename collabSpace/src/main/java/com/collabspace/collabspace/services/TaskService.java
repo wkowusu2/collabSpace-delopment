@@ -5,6 +5,7 @@ import com.collabspace.collabspace.entity.Project;
 import com.collabspace.collabspace.entity.Task;
 import com.collabspace.collabspace.entity.Subtask;
 import com.collabspace.collabspace.enums.TaskStatus;
+import com.collabspace.collabspace.exceptions.ProjectDoesNotExistException;
 import com.collabspace.collabspace.repository.ProjectRepository;
 import com.collabspace.collabspace.repository.TaskRepository;
 import com.collabspace.collabspace.repository.SubtaskRepository;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -26,13 +28,15 @@ public class TaskService {
 
     @Transactional
     public TaskResponseDto createTask(TaskRequestDto taskRequestDto, UUID userId) {
-        Project project = projectRepository.findById(taskRequestDto.getProjectId())
-                .orElseThrow(() -> new RuntimeException("Project not found"));
-
+        UUID projectId = taskRequestDto.getProjectId();
+        Optional<Project> project = projectRepository.findById(projectId);
+        if(project.isEmpty()) {
+            throw new ProjectDoesNotExistException("Project does not exist");
+        }
         Task task = new Task();
         task.setTitle(taskRequestDto.getTitle());
         task.setDescription(taskRequestDto.getDescription());
-        task.setProject(project);
+        task.setProject(project.get());
         task.setAssigneeId(taskRequestDto.getAssigneeId());
         task.setDueDate(taskRequestDto.getDueDate());
         task.setPriority(taskRequestDto.getPriority());
