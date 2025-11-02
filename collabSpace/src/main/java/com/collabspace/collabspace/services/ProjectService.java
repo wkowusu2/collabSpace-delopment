@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -76,5 +77,12 @@ public class ProjectService {
         responseDto.put("status", "success");
         responseDto.put("message", project.getName() +" has been deleted");
         return responseDto;
+    }
+
+    public List<Project> getAllProjectsForMember(UUID memberId) {
+        //find all projectMembers with the id
+        return projectMembersRepository.findAllByMemberId(memberId);
+
+        //get all the projects with the projectId for each of the members
     }
 }
