@@ -1,5 +1,6 @@
 package com.collabspace.collabspace.services;
 
+import com.collabspace.collabspace.dto.CreateProjectDto;
 import com.collabspace.collabspace.dto.ProjectRequestDto;
 import com.collabspace.collabspace.dto.ProjectResponseDto;
 import com.collabspace.collabspace.dto.UserDetailsDto;
@@ -31,12 +32,12 @@ public class ProjectService {
 
 
     @Transactional
-    public ProjectResponseDto createProject(ProjectRequestDto projectRequestDto, UserDetailsDto userDetails) {
+    public ProjectResponseDto createProject(CreateProjectDto projectRequestDto, UUID creatorId) {
         //create a project
         Project project = new Project();
         project.setName(projectRequestDto.getName());
         project.setDescription(projectRequestDto.getDescription());
-        project.setCreatedBy(userDetails.getId());
+        project.setCreatedBy(creatorId);
         project.setStartDate(projectRequestDto.getStart_date());
         project.setEndDate(projectRequestDto.getEnd_date());
         Project savedProject = projectRepository.save(project);
@@ -45,9 +46,9 @@ public class ProjectService {
         ProjectMembers member = new ProjectMembers();
         member.setMemberRole(MemberRole.PROJECT_ADMIN);
         member.setProjectId(project.getId());
-        member.setMemberId(userDetails.getId());
-        member.setEmail(userDetails.getEmail());
-        member.setFullName(userDetails.getFullName());
+        member.setMemberId(creatorId);
+        member.setEmail(projectRequestDto.getEmail());
+        member.setFullName(projectRequestDto.getFullName());
         projectMembersRepository.save(member);
         return getProjectResponseDto(savedProject);
     }
