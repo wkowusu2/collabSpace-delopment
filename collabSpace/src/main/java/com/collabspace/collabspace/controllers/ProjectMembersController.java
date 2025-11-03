@@ -1,7 +1,9 @@
 package com.collabspace.collabspace.controllers;
 
+import com.collabspace.collabspace.dto.MemberMapDto;
 import com.collabspace.collabspace.dto.RoleChangeRequest;
 import com.collabspace.collabspace.dto.TeamMemberDto;
+import com.collabspace.collabspace.dto.UpdateMemberRoleDto;
 import com.collabspace.collabspace.entity.ProjectMembers;
 import com.collabspace.collabspace.services.ProjectMembersService;
 import jakarta.validation.Valid;
@@ -21,7 +23,7 @@ public class ProjectMembersController {
     private final ProjectMembersService  projectMembersService;
     @PostMapping
     public ResponseEntity<?> addProjectMembers(@Valid @RequestBody TeamMemberDto projectMembers) {
-       Map<String, String> response = projectMembersService.addMember(projectMembers);
+        MemberMapDto response = projectMembersService.addMember(projectMembers);
        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -33,13 +35,13 @@ public class ProjectMembersController {
 
     @DeleteMapping("/{projectId}/members/{memberId}")
     public ResponseEntity<?> deleteProjectMember(@PathVariable UUID projectId, @PathVariable UUID memberId) {
-        Map<String,String> response = projectMembersService.removeMemberFromTeam(projectId, memberId);
+        MemberMapDto response = projectMembersService.removeMemberFromTeam(projectId, memberId);
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{projectId}/members/{memberId}")
     public ResponseEntity<?> updateRoleOfMembers(@PathVariable UUID projectId, @PathVariable UUID memberId, @Valid @RequestBody RoleChangeRequest role) {
-        Map<String,String> response = projectMembersService.updateMemberRole(projectId, memberId, role);
+        UpdateMemberRoleDto response = projectMembersService.updateMemberRole(projectId, memberId, role);
         return ResponseEntity.ok(response);
     }
 }
