@@ -1,5 +1,6 @@
 package com.collabspace.collabspace.services;
 
+import com.collabspace.collabspace.dto.MemberMapDto;
 import com.collabspace.collabspace.dto.TeamCreationRequestDto;
 import com.collabspace.collabspace.dto.TeamResponseDto;
 import com.collabspace.collabspace.dto.UserDetailsDto;
@@ -52,21 +53,19 @@ public class TeamService {
     }
 
     @Transactional
-    public Map<String, String> deleteTeam(UUID teamId) {
+    public MemberMapDto deleteTeam(UUID teamId) {
         //check if team exists
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() ->  new TeamDoesNotExistException("Team does not exist"));
         teamRepository.delete(team);
-        Map<String, String> response = new HashMap<>();
-        String status = "true";
-        String message = "Team has been deleted";
-        response.put("status", status);
-        response.put("message", message);
-        return response;
+        MemberMapDto responseDto = new MemberMapDto();
+        responseDto.setMessage("Successfully deleted team");
+        responseDto.setStatus(true);
+        return responseDto;
     }
 
     @Transactional
-    public Map<String, String> addMemberToTeam(UUID teamId, UUID memberId) {
+    public MemberMapDto addMemberToTeam(UUID teamId, UUID memberId) {
         //check if the team exit by Id
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new TeamDoesNotExistException("Team does not exist"));
@@ -77,16 +76,14 @@ public class TeamService {
         }
         team.getMemberIds().add(memberId);
         teamRepository.save(team);
-        Map<String, String> response = new HashMap<>();
-        String status = "true";
-        String message = "Member has been added";
-        response.put("status", status);
-        response.put("message", message);
+        MemberMapDto response =  new MemberMapDto();
+        response.setMessage("Successfully added team member");
+        response.setStatus(true);
         return response;
     }
 
     @Transactional
-    public Map<String, String> removeMemberFromTeam(UUID teamId, UUID memberId) {
+    public MemberMapDto removeMemberFromTeam(UUID teamId, UUID memberId) {
         //check if the team exit by Id
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new TeamDoesNotExistException("Team does not exist"));
@@ -97,11 +94,9 @@ public class TeamService {
         }
         team.getMemberIds().remove(memberId);
         teamRepository.save(team);
-        Map<String, String> response = new HashMap<>();
-        String status = "true";
-        String message = "Member has been removed";
-        response.put("status", status);
-        response.put("message", message);
+        MemberMapDto response =  new MemberMapDto();
+        response.setMessage("Successfully removed team member");
+        response.setStatus(true);
         return response;
     }
 }

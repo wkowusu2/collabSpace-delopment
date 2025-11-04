@@ -16,20 +16,8 @@ public class CollabSpaceApplication {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(CollabSpaceApplication.class, args);
-        Environment env = context.getEnvironment();
-
-        logger.info("=".repeat(80));
-        logger.info("ACTIVE PROFILES: {}", Arrays.toString(env.getActiveProfiles()));
-        logger.info("DATABASE URL: {}", maskPassword(env.getProperty("spring.datasource.url")));
-        logger.info("DATABASE USERNAME: {}", env.getProperty("spring.datasource.username"));
-        logger.info("=".repeat(80));
         logger.info("------CollabSpaceApplication started------");
     }
 
-    private static String maskPassword(String url) {
-        if (url == null) return "NOT SET";
-        // Mask password in connection string
-        return url.replaceAll(":[^:@]+@", ":****@");
-    }
 
 }

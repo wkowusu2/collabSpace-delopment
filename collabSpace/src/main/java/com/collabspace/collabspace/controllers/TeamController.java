@@ -1,5 +1,6 @@
 package com.collabspace.collabspace.controllers;
 
+import com.collabspace.collabspace.dto.MemberMapDto;
 import com.collabspace.collabspace.dto.TeamCreationRequestDto;
 import com.collabspace.collabspace.dto.TeamResponseDto;
 import com.collabspace.collabspace.dto.UserDetailsDto;
@@ -38,20 +39,20 @@ public class TeamController {
     }
 
     @DeleteMapping("/{teamId}")
-    public ResponseEntity<Map<String, String>> deleteTeam(@PathVariable UUID teamId) {
-        Map<String, String> response = teamService.deleteTeam(teamId);
+    public ResponseEntity<MemberMapDto> deleteTeam(@PathVariable UUID teamId) {
+        MemberMapDto response = teamService.deleteTeam(teamId);
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{teamId}/members/{memberId}")
-    public ResponseEntity<Map<String, String>> addMemberToTeam(@PathVariable UUID teamId, @PathVariable UUID memberId){
-        Map<String,String> response = teamService.addMemberToTeam(teamId, memberId);
+    public ResponseEntity<MemberMapDto> addMemberToTeam(@PathVariable UUID teamId, @PathVariable UUID memberId){
+        MemberMapDto response = teamService.addMemberToTeam(teamId, memberId);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{teamId}/members/{memberId}")
-    public ResponseEntity<Map<String, String>> removeMemberFromTeam(@PathVariable UUID teamId, @PathVariable UUID memberId){
-        Map<String,String> response = teamService.removeMemberFromTeam(teamId, memberId);
+    public ResponseEntity<MemberMapDto> removeMemberFromTeam(@PathVariable UUID teamId, @PathVariable UUID memberId){
+        MemberMapDto response = teamService.removeMemberFromTeam(teamId, memberId);
         return ResponseEntity.ok(response);
     }
 }

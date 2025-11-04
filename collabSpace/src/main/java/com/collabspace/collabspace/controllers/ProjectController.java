@@ -1,5 +1,6 @@
 package com.collabspace.collabspace.controllers;
 
+import com.collabspace.collabspace.dto.CreateProjectDto;
 import com.collabspace.collabspace.dto.ProjectRequestDto;
 import com.collabspace.collabspace.dto.ProjectResponseDto;
 import com.collabspace.collabspace.dto.UserDetailsDto;
@@ -25,11 +26,10 @@ public class ProjectController {
 
 
     @PostMapping
-    public ResponseEntity<ProjectResponseDto>  createProject(@Valid @RequestBody ProjectRequestDto projectDto,
-                        @RequestHeader("X-User") String userJson) throws JsonProcessingException {
-         ObjectMapper mapper = new ObjectMapper();
-         UserDetailsDto userDetails = mapper.readValue(userJson, UserDetailsDto.class);
-        ProjectResponseDto responseDto = projectService.createProject(projectDto, userDetails);
+    public ResponseEntity<ProjectResponseDto>  createProject(@Valid @RequestBody CreateProjectDto projectDto,
+                        @RequestHeader("X-User-Id") UUID creatorId) throws JsonProcessingException {
+
+        ProjectResponseDto responseDto = projectService.createProject(projectDto, creatorId);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
