@@ -74,24 +74,34 @@ public class TaskService {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
 
+
         if (taskRequestDto.getProjectId() != null) {
             Project project = projectRepository.findById(taskRequestDto.getProjectId())
                     .orElseThrow(() -> new ProjectDoesNotExistException("Project not found with id: " + taskRequestDto.getProjectId()));
             task.setProject(project);
         }
 
-        if (taskRequestDto.getTitle() != null) {
-            task.setTitle(taskRequestDto.getTitle());
+
+        if (taskRequestDto.getTitle() != null && !taskRequestDto.getTitle().trim().isEmpty()) {
+            task.setTitle(taskRequestDto.getTitle().trim());
         }
+
+
         if (taskRequestDto.getDescription() != null) {
-            task.setDescription(taskRequestDto.getDescription());
+            task.setDescription(taskRequestDto.getDescription().trim());
         }
+
+
         if (taskRequestDto.getAssigneeId() != null) {
             task.setAssigneeId(taskRequestDto.getAssigneeId());
         }
+
+
         if (taskRequestDto.getDueDate() != null) {
             task.setDueDate(taskRequestDto.getDueDate());
         }
+
+
         if (taskRequestDto.getPriority() != null) {
             task.setPriority(taskRequestDto.getPriority());
         }
