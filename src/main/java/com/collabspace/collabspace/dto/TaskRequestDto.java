@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,7 +22,7 @@ public class TaskRequestDto {
 
     private UUID assigneeId;
 
-    private Date dueDate;
+    private LocalDate dueDate;
 
     private Priority priority = Priority.MEDIUM;
 

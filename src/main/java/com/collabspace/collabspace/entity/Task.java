@@ -11,7 +11,6 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,7 +26,7 @@ public class Task {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id")
+    @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
     @NotNull
@@ -39,13 +38,14 @@ public class Task {
     private UUID assigneeId;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private TaskStatus status = TaskStatus.TO_DO;
 
     @Enumerated(EnumType.STRING)
     private Priority priority = Priority.MEDIUM;
 
     @Column(name = "due_date")
-    private Date dueDate;
+    private LocalDate dueDate;
 
     @Column(name = "created_at")
     private LocalDate creationAt = LocalDate.now();
@@ -54,7 +54,6 @@ public class Task {
     @OneToMany(mappedBy = "parentTask", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Subtask> subtasks = new ArrayList<>();
 
-    // Linked work items (self-referencing for task dependencies)
     @ManyToMany
     @JoinTable(
             name = "task_linked_work_items",
