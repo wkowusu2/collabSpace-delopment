@@ -1,6 +1,7 @@
 package com.collabspace.collabspace.controllers;
 
 import com.collabspace.collabspace.dto.*;
+import com.collabspace.collabspace.entity.Task;
 import com.collabspace.collabspace.enums.TaskStatus;
 import com.collabspace.collabspace.services.TaskService;
 import jakarta.validation.Valid;
@@ -69,15 +70,6 @@ public class TaskController {
     public ResponseEntity<Void> deleteTask(@PathVariable UUID taskId) {
         taskService.deleteTask(taskId);
         return ResponseEntity.noContent().build();
-    }
-
-    @PatchMapping("/{taskId}/assignee")
-    public ResponseEntity<TaskResponseDto> updateTaskAssignee(
-            @PathVariable UUID taskId,
-            @RequestParam UUID assigneeId) {
-
-        TaskResponseDto responseDto = taskService.updateTaskAssignee(taskId, assigneeId);
-        return ResponseEntity.ok(responseDto);
     }
 
     @PostMapping("/{taskId}/subtasks")

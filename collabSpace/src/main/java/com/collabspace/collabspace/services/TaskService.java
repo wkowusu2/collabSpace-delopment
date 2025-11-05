@@ -125,16 +125,6 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskResponseDto updateTaskAssignee(UUID taskId, UUID assigneeId) {
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
-
-        task.setAssigneeId(assigneeId);
-        Task updatedTask = taskRepository.save(task);
-        return convertToTaskResponseDto(updatedTask);
-    }
-
-    @Transactional
     public TaskResponseDto addLinkedWorkItem(UUID taskId, UUID linkedTaskId) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found"));

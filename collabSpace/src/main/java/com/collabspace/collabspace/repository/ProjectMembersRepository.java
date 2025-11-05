@@ -1,5 +1,6 @@
 package com.collabspace.collabspace.repository;
 
+import com.collabspace.collabspace.entity.Project;
 import com.collabspace.collabspace.entity.ProjectMembers;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,4 +21,11 @@ public interface ProjectMembersRepository extends JpaRepository<ProjectMembers, 
 
     List<ProjectMembers> findByProjectId(UUID projectId);
 
+    @Query("""
+        SELECT p 
+        FROM Project p 
+        JOIN ProjectMembers pm ON p.id = pm.projectId 
+        WHERE pm.memberId = :memberId
+    """)
+    List<Project> findAllByMemberId(@Param("memberId") UUID memberId);
 }
