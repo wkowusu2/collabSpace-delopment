@@ -25,9 +25,6 @@ public class Project {
     @NotNull
     private String name;
     private String description;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "team_id")
-    private Team team;
     @Column(name = "created_by")
     private UUID createdBy;
     @Column(name = "start_date")
