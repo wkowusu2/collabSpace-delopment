@@ -4,6 +4,7 @@ import com.collabspace.collabspace.dto.CreateProjectDto;
 import com.collabspace.collabspace.dto.ProjectRequestDto;
 import com.collabspace.collabspace.dto.ProjectResponseDto;
 import com.collabspace.collabspace.dto.UserDetailsDto;
+import com.collabspace.collabspace.entity.Project;
 import com.collabspace.collabspace.services.ProjectService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -35,6 +37,11 @@ public class ProjectController {
     public ResponseEntity<ProjectResponseDto> getProjectById(@PathVariable UUID projectId){
         ProjectResponseDto projectResponseDto = projectService.getProjectById(projectId);
         return ResponseEntity.ok(projectResponseDto);
+    }
+    @GetMapping
+    public ResponseEntity<List<Project>> getAllProjectsForAMember(@RequestParam UUID memberId){
+        List<Project> response = projectService.getAllProjectsForMember(memberId);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{projectId}")
