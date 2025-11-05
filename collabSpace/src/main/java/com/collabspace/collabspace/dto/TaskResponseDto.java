@@ -25,4 +25,5 @@ public class TaskResponseDto {
     private LocalDate createdAt;
     private List<SubtaskResponseDto> subtasks;
     private List<TaskLinkDto> linkedWorkItems;
+    private List<AttachmentDto> attachments;
 }
