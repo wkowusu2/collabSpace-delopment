@@ -73,7 +73,7 @@ public class ProjectService {
 
     public Map<String, String> deleteProject(UUID projectId) {
         Project project = projectValidator.ensureProjectExists(projectId);
-        projectRepository.deleteById(project.getId());
+        projectRepository.delete(project);
         Map<String, String> responseDto = new HashMap<>();
         responseDto.put("status", "success");
         responseDto.put("message", project.getName() +" has been deleted");
@@ -83,7 +83,5 @@ public class ProjectService {
     public List<Project> getAllProjectsForMember(UUID memberId) {
         //find all projectMembers with the id
         return projectMembersRepository.findAllByMemberId(memberId);
-
-        //get all the projects with the projectId for each of the members
     }
 }
