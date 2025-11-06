@@ -2,6 +2,7 @@ package com.collabspace.collabspace.repository;
 
 import com.collabspace.collabspace.entity.Project;
 import com.collabspace.collabspace.entity.ProjectMembers;
+import com.collabspace.collabspace.enums.MemberRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -28,4 +29,8 @@ public interface ProjectMembersRepository extends JpaRepository<ProjectMembers, 
         WHERE pm.memberId = :memberId
     """)
     List<Project> findAllByMemberId(@Param("memberId") UUID memberId);
+    boolean existsByProjectIdAndMemberIdAndMemberRoleIn(
+            UUID projectId,
+            UUID memberId,
+            List<MemberRole> memberRoles);
 }

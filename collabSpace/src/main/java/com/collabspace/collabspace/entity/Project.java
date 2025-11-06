@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -35,5 +36,10 @@ public class Project {
     private ProjectStatus status =  ProjectStatus.ACTIVE;
     private Instant createdAt =  Instant.now();
     private Instant lastModified = Instant.now();
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Task> tasks;
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Team> teams;
+
 }
 

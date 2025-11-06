@@ -1,10 +1,12 @@
 package com.collabspace.collabspace.services;
 
 import com.collabspace.collabspace.dto.*;
+import com.collabspace.collabspace.entity.Attachment;
 import com.collabspace.collabspace.entity.Project;
 import com.collabspace.collabspace.entity.Task;
 import com.collabspace.collabspace.entity.Subtask;
 import com.collabspace.collabspace.enums.TaskStatus;
+import com.collabspace.collabspace.repository.AttachmentRepository;
 import com.collabspace.collabspace.exceptions.ProjectDoesNotExistException;
 import com.collabspace.collabspace.repository.ProjectRepository;
 import com.collabspace.collabspace.repository.TaskRepository;
@@ -25,6 +27,7 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final SubtaskRepository subtaskRepository;
     private final ProjectRepository projectRepository;
+    private final AttachmentRepository attachmentRepository;
 
     @Transactional
     public TaskResponseDto createTask(TaskRequestDto taskRequestDto, UUID userId) {
@@ -181,6 +184,13 @@ public class TaskService {
             responseDto.setLinkedWorkItems(linkedWorkItemDtos);
         }
 
+        // Convert attachments
+        List<Attachment> attachments = attachmentRepository.findByTask_Id(task.getId());
+        List<AttachmentDto> attachmentDtos = attachments.stream()
+                .map(this::convertToAttachmentDto)
+                .collect(Collectors.toList());
+        responseDto.setAttachments(attachmentDtos);
+
         return responseDto;
     }
 
@@ -194,5 +204,17 @@ public class TaskService {
         responseDto.setStatus(subtask.getStatus());
         responseDto.setCreatedAt(subtask.getCreatedAt());
         return responseDto;
+    }
+
+    private AttachmentDto convertToAttachmentDto(Attachment attachment) {
+        AttachmentDto dto = new AttachmentDto();
+        dto.setId(attachment.getId());
+        dto.setFileName(attachment.getFileName());
+        dto.setFileUrl(attachment.getFileUrl());
+        dto.setFileType(attachment.getFileType());
+        dto.setFileSize(attachment.getFileSize());
+        dto.setUploadedBy(attachment.getUploadedBy());
+        dto.setUploadedAt(attachment.getUploadedAt());
+        return dto;
     }
 }
