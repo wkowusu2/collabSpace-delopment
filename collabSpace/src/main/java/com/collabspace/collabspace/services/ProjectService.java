@@ -11,6 +11,7 @@ import com.collabspace.collabspace.enums.MemberRole;
 import com.collabspace.collabspace.repository.ProjectMembersRepository;
 import com.collabspace.collabspace.repository.ProjectRepository;
 import com.collabspace.collabspace.repository.TeamRepository;
+import com.collabspace.collabspace.utils.ProjectMapper;
 import com.collabspace.collabspace.utils.ProjectValidator;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -22,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.collabspace.collabspace.utils.ProjectMapper.getProjectResponseDto;
 
 @Service
 @AllArgsConstructor
@@ -51,7 +51,7 @@ public class ProjectService {
         member.setEmail(projectRequestDto.getEmail());
         member.setFullName(projectRequestDto.getFullName());
         projectMembersRepository.save(member);
-        return getProjectResponseDto(savedProject);
+        return ProjectMapper.toResponseDto(savedProject);
     }
 
     @Transactional
@@ -62,13 +62,15 @@ public class ProjectService {
         project.setStartDate(projectRequestDto.getStart_date());
         project.setEndDate(projectRequestDto.getEnd_date());
         Project savedProject = projectRepository.save(project);
-        return getProjectResponseDto(savedProject);
+        return ProjectMapper.toResponseDto(savedProject);
+
     }
 
 
     public ProjectResponseDto getProjectById(UUID projectId) {
         Project project = projectValidator.ensureProjectExists(projectId);
-        return getProjectResponseDto(project);
+        return ProjectMapper.toResponseDto(project);
+
     }
 
     public Map<String, String> deleteProject(UUID projectId) {
@@ -80,8 +82,11 @@ public class ProjectService {
         return responseDto;
     }
 
-    public List<Project> getAllProjectsForMember(UUID memberId) {
-        //find all projectMembers with the id
-        return projectMembersRepository.findAllByMemberId(memberId);
+    public List<ProjectResponseDto> getAllProjectsForMember(UUID memberId) {
+        List<Project> projects = projectMembersRepository.findAllByMemberId(memberId);
+        return projects.stream()
+                .map(ProjectMapper::toResponseDto)
+                .toList();
     }
+
 }

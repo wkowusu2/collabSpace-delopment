@@ -2,11 +2,14 @@ package com.collabspace.collabspace.utils;
 
 import com.collabspace.collabspace.dto.ProjectResponseDto;
 import com.collabspace.collabspace.entity.Project;
-import com.collabspace.collabspace.repository.ProjectRepository;
 
 public class ProjectMapper {
-    private static ProjectRepository projectRepository;
-    public static ProjectResponseDto getProjectResponseDto(Project savedProject) {
+
+    private ProjectMapper() {
+        // prevent instantiation
+    }
+
+    public static ProjectResponseDto toResponseDto(Project savedProject) {
         ProjectResponseDto responseDto = new ProjectResponseDto();
         responseDto.setId(savedProject.getId());
         responseDto.setName(savedProject.getName());

@@ -39,8 +39,8 @@ public class ProjectController {
         return ResponseEntity.ok(projectResponseDto);
     }
     @GetMapping
-    public ResponseEntity<List<Project>> getAllProjectsForAMember(@RequestParam UUID memberId){
-        List<Project> response = projectService.getAllProjectsForMember(memberId);
+    public ResponseEntity<List<ProjectResponseDto>> getAllProjectsForAMember(@RequestParam UUID memberId){
+        List<ProjectResponseDto> response = projectService.getAllProjectsForMember(memberId);
         return ResponseEntity.ok(response);
     }
 
