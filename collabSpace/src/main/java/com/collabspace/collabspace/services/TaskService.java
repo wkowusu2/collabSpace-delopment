@@ -89,15 +89,23 @@ public class TaskService {
         if (taskRequestDto.getTitle() != null && !taskRequestDto.getTitle().trim().isEmpty()) {
             task.setTitle(taskRequestDto.getTitle().trim());
         }
+
+
         if (taskRequestDto.getDescription() != null) {
             task.setDescription(taskRequestDto.getDescription().trim());
         }
+
+
         if (taskRequestDto.getAssigneeId() != null) {
             task.setAssigneeId(taskRequestDto.getAssigneeId());
         }
+
+
         if (taskRequestDto.getDueDate() != null) {
             task.setDueDate(taskRequestDto.getDueDate());
         }
+
+
         if (taskRequestDto.getPriority() != null) {
             task.setPriority(taskRequestDto.getPriority());
         }
@@ -194,14 +202,12 @@ public class TaskService {
         responseDto.setDueDate(task.getDueDate());
         responseDto.setCreatedAt(task.getCreationAt());
 
-        // Convert subtasks
         List<SubtaskResponseDto> subtaskDtos = subtaskRepository.findByParentTaskId(task.getId())
                 .stream()
                 .map(this::convertToSubtaskResponseDto)
                 .collect(Collectors.toList());
         responseDto.setSubtasks(subtaskDtos);
 
-        // Convert linked work items
         if (task.getLinkedWorkItems() != null) {
             List<TaskLinkDto> linkedWorkItemDtos = task.getLinkedWorkItems().stream()
                     .map(linkedTask -> {
