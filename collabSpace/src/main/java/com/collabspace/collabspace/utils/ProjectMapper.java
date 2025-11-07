@@ -6,7 +6,6 @@ import com.collabspace.collabspace.entity.Project;
 public class ProjectMapper {
 
     private ProjectMapper() {
-        // prevent instantiation
     }
 
     public static ProjectResponseDto toResponseDto(Project savedProject) {

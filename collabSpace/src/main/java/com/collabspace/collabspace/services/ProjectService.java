@@ -3,19 +3,15 @@ package com.collabspace.collabspace.services;
 import com.collabspace.collabspace.dto.CreateProjectDto;
 import com.collabspace.collabspace.dto.ProjectRequestDto;
 import com.collabspace.collabspace.dto.ProjectResponseDto;
-import com.collabspace.collabspace.dto.UserDetailsDto;
 import com.collabspace.collabspace.entity.Project;
 import com.collabspace.collabspace.entity.ProjectMembers;
-import com.collabspace.collabspace.entity.Team;
 import com.collabspace.collabspace.enums.MemberRole;
 import com.collabspace.collabspace.repository.ProjectMembersRepository;
 import com.collabspace.collabspace.repository.ProjectRepository;
-import com.collabspace.collabspace.repository.TeamRepository;
 import com.collabspace.collabspace.utils.ProjectMapper;
 import com.collabspace.collabspace.utils.ProjectValidator;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -88,5 +84,4 @@ public class ProjectService {
                 .map(ProjectMapper::toResponseDto)
                 .toList();
     }
-
 }

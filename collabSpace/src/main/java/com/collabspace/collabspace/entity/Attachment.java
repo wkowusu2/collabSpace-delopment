@@ -36,6 +36,10 @@ public class Attachment {
      * Using UUID to be consistent with other entities (Project.createdBy, Task.id,
      * etc.)
      */
+
+    @Column(name = "cloudinary_public_id")
+    private String cloudinaryPublicId;
+
     @Column(name = "uploaded_by", nullable = false)
     private UUID uploadedBy;
 

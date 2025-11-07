@@ -1,8 +1,6 @@
 package com.collabspace.collabspace.controllers;
 
 import com.collabspace.collabspace.dto.*;
-import com.collabspace.collabspace.entity.Task;
-import com.collabspace.collabspace.enums.TaskStatus;
 import com.collabspace.collabspace.services.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -60,9 +58,18 @@ public class TaskController {
     @PatchMapping("/{taskId}/status")
     public ResponseEntity<TaskResponseDto> updateTaskStatus(
             @PathVariable UUID taskId,
-            @RequestParam TaskStatus status) {
+            @RequestParam String status) {
 
         TaskResponseDto responseDto = taskService.updateTaskStatus(taskId, status);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @PatchMapping("/{taskId}/assignee")
+    public ResponseEntity<TaskResponseDto> updateTaskAssignee(
+            @PathVariable UUID taskId,
+            @RequestParam UUID assigneeId) {
+
+        TaskResponseDto responseDto = taskService.updateTaskAssignee(taskId, assigneeId);
         return ResponseEntity.ok(responseDto);
     }
 

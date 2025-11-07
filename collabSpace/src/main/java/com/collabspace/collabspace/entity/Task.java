@@ -51,11 +51,9 @@ public class Task {
     @Column(name = "created_at")
     private LocalDate creationAt = LocalDate.now();
 
-    // Subtasks relationship
     @OneToMany(mappedBy = "parentTask", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Subtask> subtasks = new ArrayList<>();
 
-    // Linked work items (self-referencing for task dependencies)
     @ManyToMany
     @JoinTable(
             name = "task_linked_work_items",

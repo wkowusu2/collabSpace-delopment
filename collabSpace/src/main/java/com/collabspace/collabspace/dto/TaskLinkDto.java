@@ -1,4 +1,3 @@
-// src/main/java/com/collabspace/collabspace/dto/TaskLinkDto.java
 package com.collabspace.collabspace.dto;
 
 import lombok.Getter;

@@ -8,6 +8,8 @@ import com.collabspace.collabspace.entity.Subtask;
 import com.collabspace.collabspace.enums.TaskStatus;
 import com.collabspace.collabspace.repository.AttachmentRepository;
 import com.collabspace.collabspace.exceptions.ProjectDoesNotExistException;
+import com.collabspace.collabspace.exceptions.TaskNotFoundException;
+import com.collabspace.collabspace.exceptions.InvalidStatusException;
 import com.collabspace.collabspace.repository.ProjectRepository;
 import com.collabspace.collabspace.repository.TaskRepository;
 import com.collabspace.collabspace.repository.SubtaskRepository;
@@ -31,15 +33,13 @@ public class TaskService {
 
     @Transactional
     public TaskResponseDto createTask(TaskRequestDto taskRequestDto, UUID userId) {
-        UUID projectId = taskRequestDto.getProjectId();
-        Optional<Project> project = projectRepository.findById(projectId);
-        if(project.isEmpty()) {
-            throw new ProjectDoesNotExistException("Project does not exist");
-        }
+        Project project = projectRepository.findById(taskRequestDto.getProjectId())
+                .orElseThrow(() -> new ProjectDoesNotExistException("Project not found with id: " + taskRequestDto.getProjectId()));
+
         Task task = new Task();
         task.setTitle(taskRequestDto.getTitle());
         task.setDescription(taskRequestDto.getDescription());
-        task.setProject(project.get());
+        task.setProject(project);
         task.setAssigneeId(taskRequestDto.getAssigneeId());
         task.setDueDate(taskRequestDto.getDueDate());
         task.setPriority(taskRequestDto.getPriority());
@@ -51,11 +51,15 @@ public class TaskService {
 
     public TaskResponseDto getTaskById(UUID taskId) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
+                .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
         return convertToTaskResponseDto(task);
     }
 
     public List<TaskResponseDto> getAllTasksByProject(UUID projectId) {
+        if (!projectRepository.existsById(projectId)) {
+            throw new ProjectDoesNotExistException("Project not found with id: " + projectId);
+        }
+
         List<Task> tasks = taskRepository.findByProjectId(projectId);
         return tasks.stream()
                 .map(this::convertToTaskResponseDto)
@@ -72,13 +76,21 @@ public class TaskService {
     @Transactional
     public TaskResponseDto updateTask(UUID taskId, TaskRequestDto taskRequestDto, UUID userId) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
+                .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
 
-        if (taskRequestDto.getTitle() != null) {
-            task.setTitle(taskRequestDto.getTitle());
+
+        if (taskRequestDto.getProjectId() != null) {
+            Project project = projectRepository.findById(taskRequestDto.getProjectId())
+                    .orElseThrow(() -> new ProjectDoesNotExistException("Project not found with id: " + taskRequestDto.getProjectId()));
+            task.setProject(project);
+        }
+
+
+        if (taskRequestDto.getTitle() != null && !taskRequestDto.getTitle().trim().isEmpty()) {
+            task.setTitle(taskRequestDto.getTitle().trim());
         }
         if (taskRequestDto.getDescription() != null) {
-            task.setDescription(taskRequestDto.getDescription());
+            task.setDescription(taskRequestDto.getDescription().trim());
         }
         if (taskRequestDto.getAssigneeId() != null) {
             task.setAssigneeId(taskRequestDto.getAssigneeId());
@@ -95,11 +107,26 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskResponseDto updateTaskStatus(UUID taskId, TaskStatus status) {
+    public TaskResponseDto updateTaskStatus(UUID taskId, String status) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
+                .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
 
-        task.setStatus(status);
+        try {
+            TaskStatus taskStatus = TaskStatus.valueOf(status.toUpperCase());
+            task.setStatus(taskStatus);
+            Task updatedTask = taskRepository.save(task);
+            return convertToTaskResponseDto(updatedTask);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidStatusException("Invalid status: " + status + ". Valid statuses are: TO_DO, IN_PROGRESS, DONE, CANCELLED");
+        }
+    }
+
+    @Transactional
+    public TaskResponseDto updateTaskAssignee(UUID taskId, UUID assigneeId) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
+
+        task.setAssigneeId(assigneeId);
         Task updatedTask = taskRepository.save(task);
         return convertToTaskResponseDto(updatedTask);
     }
@@ -107,14 +134,14 @@ public class TaskService {
     @Transactional
     public void deleteTask(UUID taskId) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
+                .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
         taskRepository.delete(task);
     }
 
     @Transactional
     public SubtaskResponseDto addSubtask(UUID taskId, SubtaskRequestDto subtaskRequestDto) {
         Task parentTask = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Parent task not found"));
+                .orElseThrow(() -> new TaskNotFoundException("Parent task not found with id: " + taskId));
 
         Subtask subtask = new Subtask();
         subtask.setTitle(subtaskRequestDto.getTitle());
@@ -130,10 +157,10 @@ public class TaskService {
     @Transactional
     public TaskResponseDto addLinkedWorkItem(UUID taskId, UUID linkedTaskId) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
+                .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
 
         Task linkedTask = taskRepository.findById(linkedTaskId)
-                .orElseThrow(() -> new RuntimeException("Linked task not found"));
+                .orElseThrow(() -> new TaskNotFoundException("Linked task not found with id: " + linkedTaskId));
 
         if (!task.getLinkedWorkItems().contains(linkedTask)) {
             task.getLinkedWorkItems().add(linkedTask);
@@ -144,6 +171,10 @@ public class TaskService {
     }
 
     public List<SubtaskResponseDto> getSubtasksByTask(UUID taskId) {
+        if (!taskRepository.existsById(taskId)) {
+            throw new TaskNotFoundException("Task not found with id: " + taskId);
+        }
+
         List<Subtask> subtasks = subtaskRepository.findByParentTaskId(taskId);
         return subtasks.stream()
                 .map(this::convertToSubtaskResponseDto)
