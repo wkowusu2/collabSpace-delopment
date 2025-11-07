@@ -31,7 +31,7 @@ public class AttachmentController {
             @RequestHeader("X-User-Id") UUID userId) {
         try {
             Attachment saved = attachmentService.uploadFile(file, userId, taskId);
-            return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+            return ResponseEntity.status(HttpStatus.CREATED).body(convertToAttachmentDto(saved));
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(
                     Map.of("error", ex.getMessage()));
@@ -48,7 +48,7 @@ public class AttachmentController {
     public ResponseEntity<?> getAttachment(@PathVariable Long id) {
         try {
             Attachment attachment = attachmentService.getAttachmentById(id);
-            return ResponseEntity.ok(attachment);
+            return ResponseEntity.ok(convertToAttachmentDto(attachment));
         } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));
         }
@@ -66,6 +66,30 @@ public class AttachmentController {
         } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", ex.getMessage()));
+        }
+    }
+
+    @GetMapping("/{id}/view")
+    public ResponseEntity<?> viewAttachment(@PathVariable Long id) {
+        try {
+            Attachment attachment = attachmentService.getAttachmentById(id);
+
+            // Use streaming for better performance with large files
+            org.springframework.core.io.InputStreamResource resource =
+                    new org.springframework.core.io.InputStreamResource(
+                            attachmentService.getFileStream(id));
+
+            return ResponseEntity.ok()
+                    .header("Content-Type", attachment.getFileType())
+                    .header("Content-Disposition", "inline; filename=\"" + attachment.getFileName() + "\"")
+                    .header("Cache-Control", "public, max-age=3600") // Cache for 1 hour
+                    .contentLength(attachment.getFileSize())
+                    .body(resource);
+        } catch (IOException ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to retrieve file", "details", ex.getMessage()));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));
         }
     }
 
@@ -95,8 +119,13 @@ public class AttachmentController {
         dto.setId(attachment.getId());
         dto.setFileName(attachment.getFileName());
         dto.setFileUrl(attachment.getFileUrl());
+
+        // Set viewUrl for inline viewing (proxied through backend)
+        dto.setViewUrl("/api/attachments/" + attachment.getId() + "/view");
+
         dto.setFileType(attachment.getFileType());
         dto.setFileSize(attachment.getFileSize());
+        dto.setCloudinaryPublicId(attachment.getCloudinaryPublicId());
         dto.setUploadedBy(attachment.getUploadedBy());
         dto.setUploadedAt(attachment.getUploadedAt());
         return dto;

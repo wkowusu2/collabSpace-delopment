@@ -1,10 +1,11 @@
 package com.collabspace.collabspace.controllers;
 
+import com.collabspace.collabspace.dto.AcceptInvitationRequest;
 import com.collabspace.collabspace.dto.MemberMapDto;
 import com.collabspace.collabspace.dto.RoleChangeRequest;
 import com.collabspace.collabspace.dto.TeamMemberDto;
 import com.collabspace.collabspace.dto.UpdateMemberRoleDto;
-import com.collabspace.collabspace.entity.ProjectMembers;
+import com.collabspace.collabspace.services.InvitationService;
 import com.collabspace.collabspace.services.ProjectMembersService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -13,18 +14,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/project-members")
 @AllArgsConstructor
 public class ProjectMembersController {
-    private final ProjectMembersService  projectMembersService;
+    private final ProjectMembersService projectMembersService;
+    private final InvitationService invitationService;
+
     @PostMapping
     public ResponseEntity<?> addProjectMembers(@Valid @RequestBody TeamMemberDto projectMembers) {
         MemberMapDto response = projectMembersService.addMember(projectMembers);
-       return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{projectId}")
@@ -40,8 +42,16 @@ public class ProjectMembersController {
     }
 
     @PutMapping("/{projectId}/members/{memberId}")
-    public ResponseEntity<?> updateRoleOfMembers(@PathVariable UUID projectId, @PathVariable UUID memberId, @Valid @RequestBody RoleChangeRequest role) {
+    public ResponseEntity<?> updateRoleOfMembers(@PathVariable UUID projectId, @PathVariable UUID memberId,
+            @Valid @RequestBody RoleChangeRequest role) {
         UpdateMemberRoleDto response = projectMembersService.updateMemberRole(projectId, memberId, role);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/internal/members")
+    public ResponseEntity<?> acceptInvitationWebhook(@Valid @RequestBody AcceptInvitationRequest request,
+            @RequestHeader("X-User-Id") UUID userId) {
+        MemberMapDto response = invitationService.acceptInvitation(request.getInvitationId(), userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

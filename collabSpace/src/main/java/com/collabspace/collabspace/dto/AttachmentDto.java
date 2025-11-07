@@ -12,8 +12,10 @@ public class AttachmentDto {
     private Long id;
     private String fileName;
     private String fileUrl;
+    private String viewUrl; // URL to view the file inline (for PDFs)
     private String fileType;
     private Long fileSize;
+    private String cloudinaryPublicId;
     private UUID uploadedBy;
     private LocalDateTime uploadedAt;
 }

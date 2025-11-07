@@ -1,4 +1,3 @@
-// src/main/java/com/collabspace/collabspace/entity/Task.java
 package com.collabspace.collabspace.entity;
 
 import com.collabspace.collabspace.enums.Priority;
